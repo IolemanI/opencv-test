@@ -14,10 +14,12 @@
 ## 2
 --------
 
-Интересно, на что способна OpenCV. Решил попробовать распознавание на OpenCV. 
+Стало интересно, на что способно распознавание OpenCV. 
 
 Как обучить и запустить face detection? 
+
 [статья1](https://www.pyimagesearch.com/2018/09/24/opencv-face-recognition/)
+
 [статья2](https://www.pyimagesearch.com/2017/04/03/facial-landmarks-dlib-opencv-python/)
 
 1) Создать папку в `dataset/` с именем пользователя. Имя папки это и есть имя пользователя, которое будет отображаться на экране.
