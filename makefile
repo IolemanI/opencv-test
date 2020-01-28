@@ -1,8 +1,8 @@
 server: server.py
 	python server.py
 
-run: __init__.py
-	python __init__.py
+run: app.py
+	python app.py
 
 train: extract_embeddings.py train_model.py
 	python extract_embeddings.py
