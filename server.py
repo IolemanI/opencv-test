@@ -6,6 +6,7 @@ import jsonpickle
 import numpy as np
 import cv2
 import pickle
+import time
 
 app = Flask(__name__)
 
@@ -30,10 +31,6 @@ def get_campaigns():
     # decode image
     face = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    # do some fancy processing here....
-    blur = cv2.Laplacian(face, cv2.CV_64F).var()
-    # cv2.imwrite(str(int(blur)) + ".jpg", face)
-
     # construct a blob for the face ROI, then pass the blob
     # through our face embedding model to obtain the 128-d
     # quantification of the face
@@ -53,6 +50,10 @@ def get_campaigns():
     j = np.argmax(preds)
     proba = preds[j]
     name = le.classes_[j]
+
+    # uncoment this to save faces to disk
+    # blur = cv2.Laplacian(face, cv2.CV_64F).var()
+    # cv2.imwrite(f'{name}_{round(proba * 100, 2)}.jpg', face)
 
     # build a response dict to send back to client
     response = { 
