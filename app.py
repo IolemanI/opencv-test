@@ -8,7 +8,7 @@ import time
 import cv2
 import os
 import requests
-import json
+import jsonpickle
 from multiprocessing.dummy import Process
 
 # construct the argument parser and parse the arguments
@@ -56,7 +56,6 @@ print('[INFO] min blur is {}'.format(args['blur']))
 def sendShapshot(snapshot, callback):
     URL = 'http://127.0.0.1:5000/image'
 
-
     # prepare headers for http request
     content_type = 'image/jpeg'
     headers = {'content-type': content_type}
@@ -64,22 +63,24 @@ def sendShapshot(snapshot, callback):
     # encode image as jpeg
     _, img_encoded = cv2.imencode('.jpg', snapshot)
 
-    # send http request with image and receive response
+    # send http request with image and receive and decode response
     response = requests.post(URL, data=img_encoded.tostring(), headers=headers)
-    # decode response
-    print('[INFO] response: ', json.loads(response.text))
+    decoded = jsonpickle.decode(response.text)
+    # print('[DEBUG] decoded: ', decoded['face'])
 
-    callback()
-    # return json.loads(response.text)
+    callback(decoded['face'])
 
-def handlePass():
-    print(__name__)
+def handlePass(face):
+    name = face['name']
+    confidence = round(face['confidence'] * 100, 2)
+    
+    if name == 'unknown':
+        print('[DEBUG] denied: ', face['name'], confidence)
+    else:
+        # open the door, uter something etc.
+        print('[DEBUG] passed: {} {}'.format(face['name'], confidence))
 
-    # open the door
-    # uter something
-    # etc.
-    print('handlePass')
-    # time.sleep(5.0)
+
 
 def getDetections(frame):
     # construct a blob from the image
@@ -139,7 +140,7 @@ while True:
         blur = cv2.Laplacian(face, cv2.CV_64F).var()
 
         delta = round(time.perf_counter() - timeFlag, 2)
-        print(f'delta - {delta}')
+        print(f'[DEBUG] Face detected, wait { round(args["delta"] - delta) }')
         if blur > args['blur'] and delta > args['delta']:
             timeFlag = time.perf_counter()
             print('[INFO] sending the snapshot: {}, {}'.format(blur, round(confidence * 100)))
