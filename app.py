@@ -38,13 +38,14 @@ detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 # initialize the video stream, then allow the camera sensor to warm up
 print('[INFO] starting video stream...')
 
-if args['link'] is None:
+videoLink = args['link']
+if videoLink is None:
     print('[INFO] integrated webcam')
     vs = VideoStream(src=0).start()
 else:
-    print(f'[INFO] from link {args["link"]}')
+    print(f'[INFO] from link {videoLink}')
     # rtsp://192.168.1.104:8080/h264_ulaw.sdp - for IP Webcam Android app
-    vs = VideoStream(src=args['link']).start()
+    vs = VideoStream(src=videoLink).start()
 
 time.sleep(2.0)
 print('[INFO] frame rate is {}s'.format(args['frame_rate']))
@@ -138,10 +139,10 @@ while True:
         blur = cv2.Laplacian(face, cv2.CV_64F).var()
 
         delta = round(time.perf_counter() - timeFlag, 2)
-
+        print(f'delta - {delta}')
         if blur > args['blur'] and delta > args['delta']:
             timeFlag = time.perf_counter()
-            print('[INFO] sending the snapshot: {}, {}'.format(blur, round(confidence * 100))))
+            print('[INFO] sending the snapshot: {}, {}'.format(blur, round(confidence * 100)))
 
             # sending request to the server for person recognition in parallel 
             Process(target=sendShapshot, args=(face, handlePass)).start()
